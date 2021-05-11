@@ -2,12 +2,12 @@ This repository is intended for my own personal use to support java tuition.
 It contains exercises that students can do to learn various concepts.
 It is also intended to familiarise students with using git, and github's pull request and review functionality.
 
-##Structure
+## Structure
 * Each directory in the project is a self-contained maven project.
 * Each directory has a README.md file with details of the task(s)
 
-##For students
-###Getting started
+## For students
+### Getting started
 * Ensure you have Java 16 installed. 
   * Some of these excercises will introduce some java 16 features.
 * Create a fork of the repository. 
@@ -32,12 +32,12 @@ It is also intended to familiarise students with using git, and github's pull re
 N.B. You can also use any other git client you like, if you are familiar with something other than the command line git 
 client, use it.
 
-#Plan
+# Plan
 1. Http Requests - looking at POST and GET, request parameters and request/response bodies.
    * https://dzone.com/articles/simple-http-server-in-java
    * https://www.codeproject.com/tips/1040097/create-a-simple-web-server-in-java-http-server
 2. Json Serialization/Deserialization - how to deserialize a request body to a java object and how to serialize a 
-   java object to a response. There are many json serialization libraries out there but we will use Jackson for this.
+   java object to a response. There are many json serialization libraries out there, but we will use Jackson for this.
 3. Spring boot intro 
 4. TBD
 5. ...

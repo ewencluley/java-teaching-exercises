@@ -1,4 +1,4 @@
-#Task
+# Task
 
 Add functionality to the http server so that for a POST request to the `/exaggerate` endpoint will read in a text 
 request body and return it with every number in the text doubled.
@@ -31,7 +31,7 @@ If you can it would be great to have some unit tests for the class you create th
 a little fiddly (as you will have to use mocks that have methods that return mocks) but I have proivided an example for 
 a test for a simple request handler.
 
-##Stretch Goal
+## Stretch Goal
 Allow the request to specify a query parameter called `factor` which will be a number that will determine how 
 much the number in the request body will be multiplied by.
 Example request:
