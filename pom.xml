@@ -11,6 +11,7 @@
   <modules>
     <module>01-http-requests</module>
     <module>02-json-serialization</module>
+    <module>03-spring-boot</module>
   </modules>
   
   <packaging>pom</packaging>
