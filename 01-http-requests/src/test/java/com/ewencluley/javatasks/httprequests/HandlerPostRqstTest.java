@@ -7,7 +7,11 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.*;
 
@@ -15,15 +19,17 @@ public class HandlerPostRqstTest {
 
     //Create the object to test. Added as a filed to create once
     HandlerPostRqst postRqstHandler = new HandlerPostRqst();
+    URI url;
+    {
+        try {
+            url = new URI("http://localhost:8000/exaggerate?factor");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void givenGetRequest_shouldRespondWith405() throws IOException {
-        /*
-        1. Receive a request from the client
-        2. Verify the header (Anything but POST)
-        3. Return header 405
-        4. close output
-        */
 
         //Create a mock object of the http exchange class to simulate the action
         HttpExchange mockExchange = mock(HttpExchange.class);
@@ -34,6 +40,9 @@ public class HandlerPostRqstTest {
         //add the response to the client **** I don't think I have to add this because the object should stop before sending anything****
         ByteArrayOutputStream bodyResponse = new ByteArrayOutputStream();
         when(mockExchange.getResponseBody()).thenReturn(bodyResponse);
+
+        // mocking url parameters
+        when(mockExchange.getRequestURI()).thenReturn(url);
 
         postRqstHandler.handle(mockExchange);
 
@@ -58,6 +67,9 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream severResponseBody = new ByteArrayOutputStream();
         when(exchangeConnection.getResponseBody()).thenReturn(severResponseBody);
 
+        // mocking url parameters
+        when(exchangeConnection.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeConnection);
 
         Assert.assertEquals(clientRequestBody, severResponseBody.toString());
@@ -77,10 +89,19 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
 
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeHandler);
 
-        // verify response
-        Assert.assertEquals("18", responseBody.toString());
+        Pattern urlPattern = Pattern.compile("^.*\\?(.+)=(.+)$");
+        Matcher matcher = urlPattern.matcher(url.toString());
+        if(matcher.matches()) {
+            Assert.assertEquals(String.valueOf(9 * Integer.parseInt(matcher.group(2))), responseBody.toString());
+        } else {
+            // verify response
+            Assert.assertEquals("18", responseBody.toString());
+        }
     }
 
     @Test
@@ -97,9 +118,18 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
 
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeHandler);
 
-        Assert.assertEquals("198f6d",responseBody.toString());
+        Pattern urlPattern = Pattern.compile("^.*\\?(.+)=(.+)$");
+        Matcher matcher = urlPattern.matcher(url.toString());
+        if(matcher.matches()) {
+            Assert.assertEquals(99 * Integer.parseInt(matcher.group(2)) + "f" + 3 * Integer.parseInt(matcher.group(2)) + "d", responseBody.toString());
+        } else {
+            Assert.assertEquals("198f6d", responseBody.toString());
+        }
     }
 
     @Test
@@ -116,9 +146,18 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
 
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeHandler);
 
-        Assert.assertEquals("50 days ago",responseBody.toString());
+        Pattern urlPattern = Pattern.compile("^.*\\?(.+)=(.+)$");
+        Matcher matcher = urlPattern.matcher(url.toString());
+        if(matcher.matches()) {
+            Assert.assertEquals(25 * Integer.parseInt(matcher.group(2)) + " days ago", responseBody.toString());
+        } else {
+            Assert.assertEquals("50 days ago", responseBody.toString());
+        }
     }
 
     @Test
@@ -135,9 +174,19 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
 
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeHandler);
 
-        Assert.assertEquals("Bladimir is 50 more information times 10",responseBody.toString());
+        Pattern urlPattern = Pattern.compile("^.*\\?(.+)=(.+)$");
+        Matcher matcher = urlPattern.matcher(url.toString());
+        if(matcher.matches()) {
+            Assert.assertEquals("Bladimir is " + 25 * Integer.parseInt(matcher.group(2)) + " more information times " +
+                    5 * Integer.parseInt(matcher.group(2)), responseBody.toString());
+        } else {
+            Assert.assertEquals("Bladimir is 50 more information times 10",responseBody.toString());
+        }
     }
 
     @Test
@@ -153,6 +202,9 @@ public class HandlerPostRqstTest {
         //manipulate server's actions
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
+
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
 
         postRqstHandler.handle(exchangeHandler);
 
@@ -175,10 +227,21 @@ public class HandlerPostRqstTest {
         ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         when(exchangeHandler.getResponseBody()).thenReturn(responseBody);
 
+        // mocking url parameters
+        when(exchangeHandler.getRequestURI()).thenReturn(url);
+
         postRqstHandler.handle(exchangeHandler);
 
-        Assert.assertEquals("Edward makes $180000 a year\n" +
-                "8blad6    \n" +
-                "b",responseBody.toString());
+        Pattern urlPattern = Pattern.compile("^.*\\?(.+)=(.+)$");
+        Matcher matcher = urlPattern.matcher(url.toString());
+        if(matcher.matches()) {
+            Assert.assertEquals("Edward makes $" + 90000 * Integer.parseInt(matcher.group(2)) + " a year\n" +
+                    4 * Integer.parseInt(matcher.group(2)) + "blad" + 3 * Integer.parseInt(matcher.group(2)) + "    \n" +
+                    "b", responseBody.toString());
+        } else {
+            Assert.assertEquals("Edward makes $" + 90000 * 2 + " a year\n" +
+                    4 * 2 + "blad" + 3 * 2 +"    \n" +
+                    "b", responseBody.toString());
+        }
     }
 }

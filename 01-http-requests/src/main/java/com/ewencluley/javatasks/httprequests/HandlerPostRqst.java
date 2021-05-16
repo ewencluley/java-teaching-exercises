@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -26,10 +27,16 @@ public class HandlerPostRqst implements HttpHandler {
         String clientBody = new String(exchangedData, StandardCharsets.UTF_8);
         String[] everythingElse = new String(exchangedData, StandardCharsets.UTF_8).split("\\d+");
 
-
         StringBuilder responseBodyString = new StringBuilder();
 
-        int factor =  2; //Integer.parseInt(getParametersValue(exchange).get("factor".toLowerCase()));
+        String factor = getValue(exchange, "factor");
+        if (factor.equals("s")) {
+            responseData(exchange, "Invalid factor, expected a number",400);
+            return;
+        } else if (factor.equals("n")) {
+            responseData(exchange, "Invalid factor, expected a non empty",400);
+            return;
+        }
 
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(clientBody);
@@ -41,15 +48,15 @@ public class HandlerPostRqst implements HttpHandler {
                 if (everythingElse.length > 0) {
                     // when split method is used and the first char in exchanged data is number,
                     // the first item in the array is empty ("")
-                    responseBodyString.append(Integer.parseInt(number) * factor ).append(everythingElse[count]);
+                    responseBodyString.append(Integer.parseInt(number) * Integer.parseInt(factor) ).append(everythingElse[count]);
                 } else {
-                    responseBodyString.append(Integer.parseInt(number) * factor);
+                    responseBodyString.append(Integer.parseInt(number) * Integer.parseInt(factor));
                 }
                 count++;
                 index0IsNumber = true;
             } else {
                 if (everythingElse.length >= 1 ) {
-                    responseBodyString.append(everythingElse[count - 1]).append(Integer.parseInt(number) * factor);
+                    responseBodyString.append(everythingElse[count - 1]).append(Integer.parseInt(number) * Integer.parseInt(factor));
                 }
                 count++;
             }
@@ -78,13 +85,37 @@ public class HandlerPostRqst implements HttpHandler {
         responseBody.close();
     }
 
-    public static HashMap<String, String> getParametersValue(HttpExchange exchangeParameter) {
-        HashMap<String, String> parameterValueMap = new HashMap<>();
-        String urlParamValues = exchangeParameter.getRequestURI().getQuery().replaceAll("^.*\\?", "");
-        for (String param: urlParamValues.split("&")) {
-            String[] pair = param.split("=");
-            parameterValueMap.put(pair[0], pair[1]);
+    public static HashMap<String, String> getParametersOrValue(HttpExchange exchangeParameter) {
+        HashMap<String, String> parameterValue = new HashMap<>();
+        URI url = exchangeParameter.getRequestURI().getQuery() == null ? URI.create("") : exchangeParameter.getRequestURI();
+        String urlParamValues = url.toString();
+        if (urlParamValues.matches("\\w+=-?\\w+")) {
+            for (String param : urlParamValues.split("&")) {
+                String[] pair = param.split("=");
+                parameterValue.put(pair[0], pair[1]);
+            }
+        } else {
+            return parameterValue;
         }
-        return parameterValueMap;
+        return parameterValue;
+    }
+
+    public static String getValue (HttpExchange exchange, String keyToFind) {
+
+        String value = getParametersOrValue(exchange).get(keyToFind);
+
+        if (value == null) {
+            value = "2";
+        }
+        if (value.matches("^-?\\d+$")) { // return number is if it is a valid number (negative allowed)
+            value = value;
+        }
+        if (value.matches("\\D+")) { //find any non digit character and return -1
+            value =  "s";
+        }
+        if (value.isBlank()) { // if the key is blank, this will be an "invalid factor, expected non empty
+            value = "n";
+        }
+        return value;
     }
 }
